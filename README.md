@@ -331,3 +331,7 @@ Here are the primary classes of non-canonical circuits and the engineering trick
   • YouTube Series: Even if you don't buy the physical kit, Ben Eater's YouTube series is completely free and is widely considered the
   single best visual tutorial on digital logic and computer architecture on the internet.
   ──────
+### Books For Reading 
+* Designing Analog Chips by Hans Camenzind (Creator of the 555 timer)
+* Analysis and Design of Analog Integrated Circuits by Paul R. Gray, Hurst, Lewis, and Meyer
+* The Art of Electronics by Paul Horowitz and Winfield Hill
