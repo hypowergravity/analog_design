@@ -163,3 +163,114 @@ flowchart TD
         P4 -->|"GHz Clocks"| CPU
         CPU --> DAC2["DAC"] --> P5 --> M
 ```
+
+
+## 6. The "Periodic Table" of Microelectronics (Canonical Building Blocks)
+
+Microelectronics is deeply modular. Over **95% of the functional area** of modern microprocessors and mixed-signal SoCs is constructed by instantiating and repeating roughly **25 to 30 canonical circuit primitives**:
+
+```mermaid
+flowchart TD
+    subgraph Digital ["1. Digital Logic Primitives (~8-10 cells)"]
+        D1["Inverter (NOT) - 2 Transistors"]
+        D2["NAND2 / NOR2 - 4 Transistors"]
+        D3["Transmission Gate / MUX - 2-4 Transistors"]
+        D4["D-Latch & D-Flip-Flop - 12-24 Transistors"]
+        D5["1-Bit Full Adder - 28 Transistors"]
+    end
+
+    subgraph Memory ["2. Memory Bitcell Primitives (~3-4 cells)"]
+        M1["6T SRAM (Fast Cache) - 6 Transistors"]
+        M2["1T1C DRAM (Main System Memory) - 1 Transistor + 1 Cap"]
+        M3["1T1R RRAM / Flash (Non-Volatile / In-Memory Compute)"]
+    end
+
+    subgraph Analog ["3. Analog Circuit Primitives (~12-15 cells)"]
+        A1["Current Mirror (Simple, Cascode, Wilson)"]
+        A2["Differential Pair (The foundation of Op-Amps)"]
+        A3["Single-Stage Amplifiers (Common Source, Common Drain, Common Gate)"]
+        A4["Two-Stage Operational Transconductance Amplifier (Miller OTA)"]
+        A5["Bandgap Voltage Reference (Temp-invariant 1.2V source)"]
+        A6["Dynamic Voltage Comparator & Ring/LC Oscillators"]
+    end
+```
+
+---
+
+## 7. Open Repositories of Ready-to-Simulate SPICE Building Blocks
+
+You can download, inspect, and simulate every single canonical building block using these open-source repositories:
+
+### 1. Digital Standard Cell Library: `sky130_fd_sc_hd`
+* **Repository:** [`google/skywater-pdk-libs-sky130_fd_sc_hd`](https://github.com/google/skywater-pdk-libs-sky130_fd_sc_hd)
+* **What's inside:** Transistor-level SPICE netlists (`.spice`), layouts (`.gds`), and behavioral timing models for all digital primitives (Inverters, NAND, NOR, Flip-Flops, Adders).
+
+### 2. Analog Circuit Catalog: `iic-jku/analog-circuit-design`
+* **Repository:** [`iic-jku/analog-circuit-design`](https://github.com/iic-jku/analog-circuit-design) (Prof. Harald Pretl, JKU Linz)
+* **What's inside:** Categorized Xschem schematics and Ngspice testbenches for current mirrors, differential pairs, amplifiers, bandgaps, and comparators.
+
+### 3. Memory Compilers: `OpenRAM`
+* **Repository:** [`VLSIDA/OpenRAM`](https://github.com/VLSIDA/OpenRAM) (UC Santa Cruz)
+* **What's inside:** Complete SPICE models for 6T SRAM memory bitcells, sense amplifiers, and row decoders.
+
+### 4. Interactive Browser Simulation: Paul Falstad's Simulator
+* **Website:** [falstad.com/circuit](https://www.falstad.com/circuit/)
+* **What's inside:** Zero-install, interactive visual simulator with animated electron flow for CMOS inverters, flip-flops, 6T SRAM cells, current mirrors, and op-amps.
+
+---
+
+## 8. Canonical vs. Non-Canonical Circuits (The Frontiers of Chip Design)
+
+### 1. What Does "Canonical" Mean, and Why Only 25 to 30 Blocks?
+A **canonical circuit** is an established, mathematically proven archetype that has been standardized and refined over the past 50+ years. 
+
+Over **95% of any commercial chip's functional silicon area**—from an Apple M-series SoC to an automotive microcontroller—is assembled simply by repeating and tiling these **~25 to 30 canonical primitives**:
+
+* **Why the industry sticks strictly to canonical blocks:**
+  1. **Predictability:** Their noise margins, phase stability, and corner behaviors across temperature ($-40^\circ\text{C}$ to $+125^\circ\text{C}$) and manufacturing variations are completely understood.
+  2. **EDA Automation:** Commercial logic synthesizers and place-and-route engines (Cadence Innovus, Synopsys Fusion Compiler, OpenROAD) are built around pre-characterized standard-cell libraries (`.lib`) of these exact topologies.
+  3. **High Foundry Yield:** Leading fabs (TSMC, GlobalFoundries, SCL) tune their optical lithography and etching rules to guarantee near-99% yield for these specific gate layouts.
+
+---
+
+### 2. What are "Non-Canonical" Circuits?
+A **non-canonical circuit** is an unconventional, "rule-breaking" topology engineered when standard textbook circuits **fail to satisfy extreme physical constraints** (such as sub-half-volt operation, sub-microwatt energy budgets, or direct physical analog computation).
+
+Here are the primary classes of non-canonical circuits and the engineering tricks behind them:
+
+#### A. Bulk-Driven (Body-Driven) MOSFETs — *Beating the Threshold Voltage Barrier*
+* **The Problem:** In standard circuits, input signals are fed into the transistor's **Gate**. However, the gate requires a threshold voltage ($V_{th} \approx 0.4\text{V} - 0.7\text{V}$) just to form an inversion channel. If an energy-harvesting battery supply drops to $0.5\text{V}$, canonical amplifiers cannot turn on.
+* **The Non-Canonical Trick:** The gate is tied to a fixed DC supply, and the **input signal is injected directly into the Body/Substrate terminal (the back-gate)**.
+* **Result:** It modulates the channel depletion width directly via the bulk-transconductance ($g_{mb}$), eliminating the gate $V_{th}$ headroom requirement and allowing operational amplifiers to function at voltages as low as **$0.4\text{ V}$ to $0.6\text{ V}$**.
+
+#### B. Sub-Threshold / Weak-Inversion Logic — *Running on Leakage Currents*
+* **The Problem:** Canonical digital circuits switch transistors fully "ON" and "OFF". Charging and discharging millions of gate capacitances burns milliwatts to watts of dynamic power ($P = C \cdot V^2 \cdot f$).
+* **The Non-Canonical Trick:** The circuit operates at a supply voltage below the threshold voltage ($V_{GS} < V_{th}$). Transistors never fully turn on; they compute entirely using **exponential diffusion leakage currents**.
+* **Result:** Power consumption drops from milliwatts down to **nano-watts ($10^{-9}\text{ W}$)**. This non-canonical approach powers cardiac pacemakers, cochlear implants, and ambient-RF-powered IoT sensor nodes.
+
+#### C. Adiabatic (Energy-Recovery) Logic — *Recycling Electrical Charge*
+* **The Problem:** Every time a canonical CMOS gate switches, it dissipates stored capacitive energy to Ground as heat ($E = \frac{1}{2} C V^2$).
+* **The Non-Canonical Trick:** Instead of a constant DC power supply, adiabatic circuits use oscillating **AC power-clock waveforms** with inductive tanks to **recycle electrical charge back into the supply** rather than dumping it to ground.
+* **Result:** Achieves extreme energy efficiency and suppresses side-channel power-analysis leakage in secure cryptographic hardware.
+
+#### D. Analog Neuromorphic Crossbars (e.g., AX100 Matrix Accelerators)
+* **The Problem:** Canonical von Neumann digital processors waste up to 80% of their total energy shuffling digital matrix data back and forth between memory caches and ALU registers.
+* **The Non-Canonical Trick:** Replaces digital logic with physical crossbar arrays of non-volatile analog memristors (RRAM). 
+* **Result:** Solves linear matrix systems ($Ax = b$) directly via **Ohm's Law ($I = V \cdot G$) and Kirchhoff's Current Law ($\sum I = 0$) in under 100 nanoseconds**, treating the natural physical settling of the circuit as the calculation itself.
+
+#### E. Chaotic & Stochastic Quantum Noise Generators
+* **The Problem:** Pseudo-random digital algorithms are deterministic and vulnerable to cryptanalysis.
+* **The Non-Canonical Trick:** Operates reverse-biased Zener diodes in avalanche breakdown or captures quantum tunneling noise across thin oxides to drive a chaotic non-linear attractor circuit.
+* **Result:** Generates true, non-deterministic random bitstreams for military-grade hardware encryption.
+
+---
+
+### 3. Canonical vs. Non-Canonical Comparison Matrix
+
+| Attribute | Canonical Circuits | Non-Canonical Circuits |
+| :--- | :--- | :--- |
+| **Typical Topologies** | Inverters, NAND/NOR, D-Flip-Flop, Two-Stage Miller OTA, Bandgap, 6T SRAM | Bulk-driven amplifiers, Sub-threshold logic, Memristive crossbars, Adiabatic logic |
+| **Domain Representation** | **>95% of all silicon** (CPUs, GPUs, standard SoCs, mixed-signal chips) | **<5% specialized niche** (biomedical implants, analog AI accelerators, crypto ASICs) |
+| **EDA Toolchain Support** | **100% Automated:** Automated synthesis, STA timing, auto-routing, and DRC/LVS | **Manual / Hand-Crafted:** Standard synthesizers cannot model these physics; requires custom SPICE design |
+| **Design Risk & Yield** | Low risk; predictable across all PVT corners; high foundry yield | High risk; sensitive to temperature and process variations; requires defensive guarding |
+| **Primary Strength** | Speed, scalability, standardized modular design | Extreme power savings, low-voltage headroom survival, or physical computing shortcuts |
