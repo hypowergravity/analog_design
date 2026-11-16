@@ -133,3 +133,33 @@ SPICE software uses **Modified Nodal Analysis (MNA)** to solve $G \cdot V = I$ v
 ### Q3: Why is digital chip design easier for AI to automate than analog?
 * **Digital** has rigid abstractions (standard cell logic gates, binary noise margins, and fast Static Timing Analysis), allowing algorithms like reinforcement learning to verify billions of iterations quickly.
 * **Analog** has no standard gates, operates on continuous multi-objective trade-offs (gain vs. bandwidth vs. noise), suffers from layout-dependent parasitics, and requires hours of non-linear SPICE simulation per evaluation, creating a severe simulation bottleneck for AI training.
+
+
+### Example applications
+```mermaid
+flowchart TD
+        subgraph RealWorld ["The Physical World"]
+            S["Sensors (Microphone, Camera, ECG)"]
+            A["Antenna (5G, Wi-Fi, Radar)"]
+            B["Battery (3.7V Li-ion, 48V Bus)"]
+            M["Motors & Actuators"]
+        end
+
+        subgraph AnalogIC ["Analog IC / Analog Front-End (AFE)"]
+            P1["Power Management (PMIC / LDOs / Buck-Boost)"]
+            P2["Signal Conditioning (Low-Noise Op-Amps / Filters)"]
+            P3["RF Front-End (LNAs / Mixers / Power Amplifiers)"]
+            P4["Clock Generation (PLLs / Oscillators)"]
+            P5["Motor & Gate Drivers"]
+        end
+
+        subgraph Digital ["Digital Brain"]
+            CPU["CPU / GPU / AI Accelerator (Digital 0s and 1s)"]
+        end
+
+        B --> P1 --> CPU
+        S --> P2 --> ADC["ADC"] --> CPU
+        A <--> P3 <--> ADC & DAC["ADC / DAC"] <--> CPU
+        P4 -->|"GHz Clocks"| CPU
+        CPU --> DAC2["DAC"] --> P5 --> M
+```
