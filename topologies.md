@@ -304,27 +304,6 @@ These are not transistor-level topologies but reusable digital IP blocks.
 
 # Research and Academic Analog Libraries
 
-## Berkeley Analog Generator (BAG)
-
-### Repository
-
-https://github.com/BerkeleyAnalog
-
-### Reusable Blocks
-
-```text
-Current Mirrors
-Comparators
-OTAs
-Bandgaps
-ADCs
-DACs
-```
-
-Targeted at analog IC research and generator-based design.
-
----
-
 ## ALIGN Analog Layout
 
 ### Repository
