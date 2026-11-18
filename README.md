@@ -335,3 +335,5 @@ Here are the primary classes of non-canonical circuits and the engineering trick
 * Designing Analog Chips by Hans Camenzind (Creator of the 555 timer)
 * Analysis and Design of Analog Integrated Circuits by Paul R. Gray, Hurst, Lewis, and Meyer
 * The Art of Electronics by Paul Horowitz and Winfield Hill
+### Course 
+* Course by prof wilffern[https://github.com/wulffern/aic2023/tree/main]
