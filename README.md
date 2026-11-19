@@ -336,4 +336,5 @@ Here are the primary classes of non-canonical circuits and the engineering trick
 * Analysis and Design of Analog Integrated Circuits by Paul R. Gray, Hurst, Lewis, and Meyer
 * The Art of Electronics by Paul Horowitz and Winfield Hill
 ### Course 
-* Course by prof wilffern[https://github.com/wulffern/aic2023/tree/main]
+* Course by prof wilffern [https://github.com/wulffern/aic2023/tree/main]
+* universalization of IC design in CASS [unic-cass.github.io/training/sky130] 
